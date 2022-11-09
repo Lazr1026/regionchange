@@ -45,9 +45,9 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 1. Start FTP (one that lets you access system files).
 1. Navigate to `storage_mlc01/sys/title/`
 1. Click to view a list of titles to delete.
-- [JPN](./JPN.md)
-- [USA](./USA.md)
-- [EUR](./EUR.md)
+- [JPN](../docs/JPN.md)
+- [USA](../docs/USA.md)
+- [EUR](../docs/EUR.md)
 
 ## Credits
 - Lazr - Figured out how to do it.
