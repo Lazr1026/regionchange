@@ -52,5 +52,5 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 ## Credits
 - Lazr - Figured out how to do it.
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
-- NoahAbc12345 - Helping figure out it out
-(The Bad Time Trio /s)
+- NoahAbc12345 - Helping figure out it out  
+(You could call us "The Bad Time Trio" /s)
