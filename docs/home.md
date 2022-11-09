@@ -40,6 +40,9 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 1. Complete initial setup.
 - You will see duplicate titles. This is normal as the titles from the original region are still installed.
 
+### WTF? WHY DO I HAVE TO FORMAT?
+You have to format the system or else you will not boot after changing the `product_area` value. I dont know why\ especially since I have changed it in the past and I was still able to boot fine.
+
 ## Removing old titles
 !> VERY easy way to brick if you arent paying attention.
 1. Start FTP (one that lets you access system files).
