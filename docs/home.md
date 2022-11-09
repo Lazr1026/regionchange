@@ -2,11 +2,11 @@
 
 Honestly I didn't want to write this because of the brick risks involved. You have to edit many system files which when done wrong can lead to devastating consequences.
 
-If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
-
-That being said, be careful and have a NAND Backup just in case.
-
-Oh, and after region changing, you will need a gamepad from that region (unless you use Aroma, which has that region-free gamepad pairing plugin)
+## Notes
+- You lose eshop access unless you are lucky enough to not have anything linked to the console.
+- If you do not have a gamepad from the region you are changing to, after region changing install [Aroma](https://aroma.foryour.cafe) and use its region-free gamepad paring plugin.
+- If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
+- That being said, be careful and have a NAND Backup just in case. I am not responsible if you fuck up your system.
 
 ## What you need:
 - A Brain, a large one at that.
@@ -38,8 +38,8 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 1. Start a System Update. It should start to "Update".
 1. Wait for the update to finish. When its done you should be taken to the desired regions Wii U Menu.
 1. Complete initial setup.
-	- You will see duplicate titles. This is normal as the titles from the original region are still installed.
-	
+- You will see duplicate titles. This is normal as the titles from the original region are still installed.
+
 ## Removing old titles
 !> VERY easy way to brick if you arent paying attention.
 1. Start FTP (one that lets you access system files).
@@ -48,3 +48,9 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 - [JPN](./JPN.md)
 - [USA](./USA.md)
 - [EUR](./EUR.md)
+
+## Credits
+- Lazr - Figured out how to do it.
+- GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
+- NoahAbc12345 - Helping figure out it out
+(The Bad Time Trio /s)
