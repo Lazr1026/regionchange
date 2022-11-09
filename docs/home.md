@@ -11,7 +11,7 @@ Oh, and after region changing, you will need a gamepad from that region (unless 
 ## What you need:
 - A Brain, a large one at that.
 - A way to run [UDPIH](https://github.com/GaryOderNichts/udpih) to be able to run the recovery_menu. You *might* be able to do this without it but dont take your chances.
-- A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/regionchange/files/recovery_menu))
+- A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/recovery_menu))
 - [Python](https://www.python.org/downloads/)
 - [wupclient.py](https://raw.githubusercontent.com/Elpunical/mocha/master/ios_mcp/wupclient.py) (right-click -> Save link as… -> Click Save)
 - A text editor. Notepad will be fine
