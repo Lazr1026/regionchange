@@ -20,7 +20,7 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 
 ## Region Changing
 1. Format your console. Yes this is required. I'll explain why later (scroll down).
-1. Pair a gamepad and get to the point where you set up a network in the Initial Setup, then shut down.
+1. Pair a gamepad and get to after the point where you set up a network in the Initial Setup, then shut down.
 1. Load the recovery_menu with UDPIH.
 1. Start wupserver in the recovery_menu.
 1. Open the command line/terminal where you saved `wupclient.py`
