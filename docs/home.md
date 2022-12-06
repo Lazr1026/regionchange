@@ -55,5 +55,5 @@ You have to format the system or else you will not boot after changing the `prod
 ## Credits
 - Lazr - Figured out how to do it.
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
-- NoahAbc12345 - Helping figure out it out  
+- NoahAbc12345 - Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://noahabc12345.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.  
 (You could call us "The Bad Time Trio" /s)
