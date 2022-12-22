@@ -3,7 +3,7 @@
 Honestly I didn't want to write this because of the brick risks involved. You have to edit many system files which when done wrong can lead to devastating consequences.
 
 ## Notes
-- You lose eshop access unless you are lucky enough to not have anything linked to the console.
+- You lose eshop access.
 - If you do not have a gamepad from the region you are changing to, after region changing install [Aroma](https://aroma.foryour.cafe) and use its region-free gamepad paring plugin.
 - If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
 - That being said, be careful and have a NAND Backup just in case. I am not responsible if you fuck up your system.
