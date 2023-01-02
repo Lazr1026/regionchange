@@ -16,6 +16,7 @@ Honestly I didn't want to write this because of the brick risks involved. You ha
 - [Python](https://www.python.org/downloads/)
 - [wupclient.py](https://raw.githubusercontent.com/Elpunical/mocha/master/ios_mcp/wupclient.py) (right-click -> Save link as… -> Click Save)
 - A text editor. Notepad will be fine
+- If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
 You may notice I didn't mention Tiramisu or Aroma. That is because it will interfere with this. You can still have it installed and follow this but it doesnt matter at the end of the day.
 
@@ -49,6 +50,7 @@ type=eth
 1. Press a button on the wiiu to shut down wupserver and go to `Set Coldboot Title`.
 1. Set the System Settings for your region as the default title.
 1. Reboot.
+1. Set an internet connection.
 1. Start a System Update. It should start to "Update".
 1. Wait for the update to finish. When its done you should be taken to the desired regions Wii U Menu.
 1. Complete initial setup.
@@ -67,7 +69,7 @@ You have to format the system or else you will not boot after changing the `prod
 - [EUR](/docs/EUR.md)
 
 ## Credits
-- Lazr - Figured out how to do it.
+- Lazr - Figured out how to do it. The writeup is [here](/docs/writeup.md).
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
 - NoahAbc12345 - Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://noahabc12345.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.  
 (You could call us "The Bad Time Trio" /s)
