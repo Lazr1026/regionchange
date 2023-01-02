@@ -6,6 +6,7 @@ Honestly I didn't want to write this because of the brick risks involved. You ha
 - You lose eshop access.
 - If you do not have a gamepad from the region you are changing to, after region changing install [Aroma](https://aroma.foryour.cafe) and use its region-free gamepad paring plugin.
 - If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
+- Unblock updates with UFDiine before following this guide (if you dont re-create the update folder it will bite you in the ass later in the guide).
 - That being said, be careful and have a NAND Backup just in case. I am not responsible if you fuck up your system.
 
 ## What you need:
@@ -19,9 +20,22 @@ Honestly I didn't want to write this because of the brick risks involved. You ha
 You may notice I didn't mention Tiramisu or Aroma. That is because it will interfere with this. You can still have it installed and follow this but it doesnt matter at the end of the day.
 
 ## Region Changing
+1. Create a file on the root of your sd named `network.cfg` and insert the following into it:
+	- If using a wifi connection:
+```
+type=wifi
+ssid=ssidhere
+key=wifikeyhere
+key_type=WPA2_PSK_AES
+```
+	- If using an ethernet connection:
+```
+type=eth
+```
 1. Format your console. Yes this is required. I'll explain why later (scroll down).
-1. Pair a gamepad and get to after the point where you set up a network in the Initial Setup, then shut down.
+1. Pair a gamepad and then shut down.
 1. Load the recovery_menu with UDPIH.
+1. Navigate to "Load Network Configuration" and press a button to exit back to the main menu.
 1. Start wupserver in the recovery_menu.
 1. Open the command line/terminal where you saved `wupclient.py`
 1. Windows: `py -3 -i wupclient.py` macOS/Linux: `python3 -i wupclient.py`
@@ -41,7 +55,7 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 - You will see duplicate titles. This is normal as the titles from the original region are still installed.
 
 ### WTF? WHY DO I HAVE TO FORMAT?
-You have to format the system or else you will not boot after changing the `product_area` value. I dont know why\ especially since I have changed it in the past and I was still able to boot fine.
+You have to format the system or else you will not boot after changing the `product_area` value. I dont know why especially since I have changed it in the past and I was still able to boot fine.
 
 ## Removing old titles
 !> VERY easy way to brick if you arent paying attention.
