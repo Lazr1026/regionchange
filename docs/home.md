@@ -22,7 +22,7 @@ You may notice I didn't mention Tiramisu or Aroma. That is because it will inter
 
 ## Region Changing
 1. Create a file on the root of your sd named `network.cfg` and insert the following into it:
-	- If using a wifi connection:
+	- If using a wifi connection (obviously replace `ssid` and `key` with what they should be):
 ```
 type=wifi
 ssid=ssidhere
