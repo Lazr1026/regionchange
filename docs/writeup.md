@@ -114,9 +114,9 @@ I think it has something to do with titles linked to that console but after doin
 The next one is the brick risk. It is very easy to brick doing this. I have two bricked consoles sitting in my room after editing system.xml manually. This is also why I opted to use a modified recovery_menu in the guide.
 
 This issue has happened on two of my consoles now.
-I cannot update to region change. 
 It will always get to the end and spit out error code `162-3002`
-From what I can tell, this happens if you region change too much.
+This happens if you cleaned the system tickets (not application tickets).
+Don't clear your tickets if you want to go back!
 
 Lastly, there's no point. Aroma has a plugin that allows for out-of region titles to boot, and there's an SDCafiine plugin that can replace the language files on boot without any of the brick risk. I actually made a guide for Wii U Menu [here](https://gbatemp.net/threads/how-to-use-the-sdcafiine-aroma-plugin-to-use-other-language-files-on-a-japanese-wii-u.621186/).
 
