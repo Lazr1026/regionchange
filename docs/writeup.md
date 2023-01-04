@@ -128,7 +128,7 @@ I think it has something to do with titles linked to that console but after doin
 
 The next one is the brick risk. It is very easy to brick doing this. I have two bricked consoles sitting in my room after editing system.xml manually. This is also why I opted to use a modified recovery_menu in the guide.
 
-[![](../files/writeup_images/bricc.jpg)](http://www.youtube.com/watch?v=Wb0SJ-FQD4k)
+[![](../files/writeup_images/bricc.jpg)](https://youtu.be/f1s2F2FHofs)
 (Hyperlink to a YouTube video.)
 
 This next issue has happened on two of my consoles now (because I didnt know until recently).
