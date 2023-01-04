@@ -4,6 +4,8 @@ Back in December of 2021 (an entire year before I wrote this) I had purchased tw
 
 One of them was a black console, which got refunded by the seller because I guess it had already been sold elsewhere.  
 
+![](../files/writeup_images/cancelled_japanese_wiiu.png)
+
 The other console was a White Console, listed as 32GB but it was an 8GB (this has nothing to do with anything really, or it might, not enough info to make a good guess).  
 The white console worked fine and I was able to get to the Wii U Menu and install Tiramisu on it.  
 Oh yeah, while the console was in the mail a Custom Firmware called Tiramisu released, replacing Haxchi and Mocha (and now Aroma is public, replacing Tiramisu in a way. Lmao).
@@ -28,6 +30,8 @@ It’s worth noting that at this point UDPIH didn't exist.
 So.. What now? Why, I took it apart and restored the NAND of course (using an RPi0! My teensy died somehow). 
 Took me an entire week but I did i- oh what the hell, 160-0103 now?
 
+![](../files/writeup_images/1600103.jpg)
+
 Yeah this console was one of those that had a bug in the eMMC chip.
 
 I could not fix it so I gave up trying anything. 
@@ -47,6 +51,8 @@ It’s a US console but that was the least of my worries.
 Now that we’re actually getting into how I figured it out, let's talk about how regions are defined in the first place. 
 In the NAND, specifically the SLC, there is a file called `sys_prod.xml` in `slc:/sys/config`. 
 Inside of it there are values that define different things the system uses, but the two we want to look at are `game_region` and `product_area`
+
+![](../files/writeup_images/regions.png)
 
 You can change one of the values and still boot, the other one not so much. 
 `product_area` is the one you cannot change.. Or can you? 
@@ -83,11 +89,18 @@ There's another `.xml` file in the same directory as `sys_prod.xml`.
 This file is called `system.xml`. 
 
 In this file, there are values that tell boot1 what OS to use and the… boot title! 
+
+![](../files/writeup_images/boottitle.png)  
+(Please ignore the fact I have System Config Tool as my autoboot title. I took this image with my kiosk system.xml.)
+
 You can set that value to System Settings and boot into it with no issues!
 
 Issue #2:  
 After installing the system update you will get into the other regions system menu, but you cannot complete the initial setup because the game_region is set for the original regions titles.  
 What I did is set it to 119 for region free (because I do this alot) but you could just set it to the target region's value. 
+
+![](../files/writeup_images/regions2.png)
+
 
 Issue #3:  
 The brick risk (i'll get into more detail later)  
@@ -102,6 +115,8 @@ So all that is said and done, and there's one last issue but it's not as major: 
 
 Since both original region and current region titles are installed, there are two titles of each. 
 
+![](../files/writeup_images/duplicates.jpg)
+
 This is simply fixed by deleting them with FTPiiU Everywhere and rebooting to flush the cache. 
 After everything is all said and done, you will have changed regions of the console! Congrats!
 
@@ -113,7 +128,10 @@ I think it has something to do with titles linked to that console but after doin
 
 The next one is the brick risk. It is very easy to brick doing this. I have two bricked consoles sitting in my room after editing system.xml manually. This is also why I opted to use a modified recovery_menu in the guide.
 
-This issue has happened on two of my consoles now.
+[![](../files/writeup_images/bricc.jpg)](http://www.youtube.com/watch?v=Wb0SJ-FQD4k)
+(Hyperlink to a YouTube video.)
+
+This next issue has happened on two of my consoles now (because I didnt know until recently).
 It will always get to the end and spit out error code `162-3002`
 This happens if you cleaned the system tickets (not application tickets).
 Don't clear your tickets if you want to go back!
