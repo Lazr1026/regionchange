@@ -41,9 +41,9 @@ type=eth
 1. Input your IP when asked,
 1. Insert`w.dl("/vol/system/config/sys_prod.xml")` into the CLI.
 1. Open `sys_prod.xml` in a text editor.
-	- Replace the `produce_area` value with the desired region. 1 = JPN, 2 = USA, 4 = EUR. Also replace the `game_region` value with `119` (RegionHax).
+	- Replace the `product_area` value with the desired region. 1 = JPN, 2 = USA, 4 = EUR. Also replace the `game_region` value with `119` (RegionHax).
 	- Make sure you save your changes!
-1. Insert `w.up("sys_prod.xml", (/vol/system/config/sys_prod.xml")` into the CLI
+1. Insert `w.up("sys_prod.xml", "/vol/system/config/sys_prod.xml")` into the CLI
 1. Exit wupclient with `exit()`
 1. Press a button on the wiiu to shut down wupserver and go to `Set Coldboot Title`.
 1. Set the System Settings for your region as the default title.
