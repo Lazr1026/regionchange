@@ -18,8 +18,6 @@ Honestly I didn't want to write this because of the brick risks involved. You ha
 - A text editor. Notepad will be fine
 - If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
-You may notice I didn't mention Tiramisu or Aroma. That is because it will interfere with this. You can still have it installed and follow this but it doesnt matter at the end of the day.
-
 ## Region Changing
 1. Create a file on the root of your sd named `network.cfg` and insert the following into it:
 	- If using a wifi connection (obviously replace `ssid` and `key` with what they should be):
