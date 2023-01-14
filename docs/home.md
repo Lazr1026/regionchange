@@ -70,4 +70,4 @@ You have to format the system or else you will not boot after changing the `prod
 - Lazr - Figured out how to do it. The writeup is [here](/docs/writeup.md).
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
 - NoahAbc12345 - Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://noahabc12345.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.  
-` Maschell - Created [Tiramisu](https://tiramisu.foryour.cafe) and [Aroma](https://https://aroma.foryour.cafe) (these *really* helped with me gaining interest).
+- Maschell - Created [Tiramisu](https://tiramisu.foryour.cafe) and [Aroma](https://https://aroma.foryour.cafe) (these *really* helped with me gaining interest).
