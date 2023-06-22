@@ -51,8 +51,9 @@ type=eth
 1. Set an internet connection.
 1. Start a System Update. It should start to "Update".
 1. Wait for the update to finish. When its done you should be taken to the desired regions Wii U Menu.
+   - If you get an error about the gamepad region, ignore it. This is to be expected.
 1. Complete initial setup.
-- You will see duplicate titles. This is normal as the titles from the original region are still installed.
+   - You will see duplicate titles. This is normal as the titles from the original region are still installed.
 
 ### WTF? WHY DO I HAVE TO FORMAT?
 You have to format the system or else you will not boot after changing the `product_area` value. I dont know why especially since I have changed it in the past and I was still able to boot fine.
