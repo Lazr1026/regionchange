@@ -1,10 +1,10 @@
 # PLEASE READ!
 
-Honestly I didn't want to write this because of the brick risks involved. You have to edit many system files which when done wrong can lead to devastating consequences.
+Honestly I didn't want to write this at the time because of the brick risks involved but nowadays can be fixed really easily.
 
 ## Notes
-- You lose eshop access (as if this even matters anymore).
-- If you do not have a gamepad from the region you are changing to, after region changing install [Aroma](https://aroma.foryour.cafe) and use its region-free gamepad paring plugin.
+- You lose eshop access but game updates do still work.
+- If you do not have a gamepad from the region you are changing to, after region changing install [Aroma](https://aroma.foryour.cafe) and use its region-free gamepad paring plugin or re-pair the gamepad in recovery_menu.
 - If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
 - Unblock updates with UFDiine before following this guide (if you dont re-create the update folder it will bite you in the ass later in the guide).
 - That being said, be careful and have a NAND Backup just in case. I am not responsible if you fuck up your system.
@@ -14,7 +14,7 @@ Honestly I didn't want to write this because of the brick risks involved. You ha
 - A way to run [UDPIH](https://github.com/GaryOderNichts/udpih) to be able to run the recovery_menu. You *might* be able to do this without it but dont take your chances.
 - A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/recovery_menu))
 - [Python](https://www.python.org/downloads/)
-- [wupclient.py](https://raw.githubusercontent.com/Elpunical/mocha/master/ios_mcp/wupclient.py) (right-click -> Save link as… -> Click Save)
+- [wupclient.py](https://gist.githubusercontent.com/GaryOderNichts/409672b1bd5627b9dc506fe0f812ec9e/raw/213854879ca62a0f02e3d48a54aef3a83d592464/wupclient.py) (right-click -> Save link as… -> Click Save)
 - A text editor. Notepad will be fine
 - If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
@@ -36,9 +36,9 @@ type=eth
 1. Load the recovery_menu with UDPIH.
 1. Navigate to "Load Network Configuration" and press a button to exit back to the main menu.
 1. Start wupserver in the recovery_menu.
+1. Edit the `wupclient.py` file in a text editor and change the IP on line 30 with the one for your console. Do not change the port.
 1. Open the command line/terminal where you saved `wupclient.py`
 1. Windows: `py -3 -i wupclient.py` macOS/Linux: `python3 -i wupclient.py`
-1. Input your IP when asked,
 1. Insert`w.dl("/vol/system/config/sys_prod.xml")` into the CLI.
 1. Open `sys_prod.xml` in a text editor.
 	- Replace the `product_area` value with the desired region. 1 = JPN, 2 = USA, 4 = EUR. Also replace the `game_region` value with `119` (RegionHax).
