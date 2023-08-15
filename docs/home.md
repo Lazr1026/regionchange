@@ -56,7 +56,7 @@ type=eth
 
 ### Removing the Gamepad Update Nag
 1. Get back into recovery_menu and start wupserver again.
-1. Insert `w.dl("/vol/system/proc/prefs/DRCCfg.xml")` intoo the CLI.
+1. Insert `w.dl("/vol/system/proc/prefs/DRCCfg.xml")` into the CLI.
 1. Open `DRCCfg.xml` in text editor.
 	- Change `versionCheckFlag` to 0.
 	- Save the file.
