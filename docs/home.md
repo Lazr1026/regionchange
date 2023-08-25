@@ -45,7 +45,7 @@ type=eth
 1. Insert `w.up("sys_prod.xml", "/vol/system/config/sys_prod.xml")` into the CLI.
 1. Exit wupclient with `exit()`.
 1. Press a button on the wiiu to shut down wupserver and go to `Set Coldboot Title`.
-1. Set the System Settings for your region as the default title.
+1. Set the System Settings for your current region as the default title.
 1. Reboot.
 1. Set an internet connection.
 1. Start a System Update. It should start to "Update".
