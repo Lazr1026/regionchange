@@ -13,7 +13,7 @@ Honestly I didn't want to write this at the time because of the brick risks invo
 - A way to run [UDPIH](https://github.com/GaryOderNichts/udpih) to be able to run the recovery_menu. You *might* be able to do this without it but dont take your chances.
 - A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/recovery_menu))
 - [Python](https://www.python.org/downloads/)
-- [wupclient.py](https://gist.githubusercontent.com/GaryOderNichts/409672b1bd5627b9dc506fe0f812ec9e/raw/213854879ca62a0f02e3d48a54aef3a83d592464/wupclient.py) (right-click -> Save link as… -> Click Save)
+- [wupclient.py](https://gist.github.com/Lazr1026/2e1d3473bf1876da356e22e0879d953a/raw/a87c1d36999c7bf1a5378d9134678d3449991ece/wupclient.py) (right-click -> Save link as… -> Click Save)
 - A text editor. Notepad will be fine
 - If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
@@ -53,6 +53,13 @@ type=eth
    - If you get an error about the gamepad region, ignore it. This is to be expected.
 1. Complete initial setup.
    - You will see duplicate titles. This is normal as the titles from the original region are still installed.
+1. Get back into recovery_menu and start wupserver again.
+1. Insert `yeet_titles('REGION')` into the CLI.
+   - Replace `REGION` with the consoles original region.
+1. Wait for the old titles to be removed.
+1. Once finished, Insert `flush_mlc()` into the CLI.
+1. Exit wupclient (`exit()`).
+1. Press a button on the wiiu to shut down wupserver and go to `Shutdown`.
 
 ### Removing the Gamepad Update Nag
 1. Get back into recovery_menu and start wupserver again.
@@ -68,17 +75,9 @@ type=eth
 ### WTF? WHY DO I HAVE TO FORMAT?
 You have to format the system or else you will not boot after changing the `product_area` value. I dont know why especially since I have changed it in the past and I was still able to boot fine.
 
-## Removing old titles
-!> VERY easy way to brick if you arent paying attention.
-1. Start FTP (one that lets you access system files).
-1. Navigate to `storage_mlc01/sys/title/`
-1. Click to view a list of titles to delete.
-- [JPN](/docs/JPN.md)
-- [USA](/docs/USA.md)
-- [EUR](/docs/EUR.md)
-
 ## Credits
 - Lazr - Figured out how to do it. The writeup is [here](/docs/writeup.md).
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
-- Nightkingale- Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://nightkingale.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.  
+- Nightkingale- Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://nightkingale.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.
 - Maschell - Created [Tiramisu](https://tiramisu.foryour.cafe) and [Aroma](https://https://aroma.foryour.cafe) (these *really* helped with me gaining interest).
+- Nonsocial for the wupclient mods (because I am too stupid for it).
