@@ -13,7 +13,7 @@ Honestly I didn't want to write this at the time because of the brick risks invo
 - A way to run [UDPIH](https://github.com/GaryOderNichts/udpih) to be able to run the recovery_menu. You *might* be able to do this without it but dont take your chances.
 - A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/recovery_menu))
 - [Python](https://www.python.org/downloads/)
-- [wupclient.py](https://gist.github.com/Lazr1026/2e1d3473bf1876da356e22e0879d953a/raw/a87c1d36999c7bf1a5378d9134678d3449991ece/wupclient.py) (right-click -> Save link as… -> Click Save)
+- [wupclient.py](https://github.com/Lazr1026/regionchange/raw/main/files/wupclient.py) (right-click -> Save link as… -> Click Save)
 - A text editor. Notepad will be fine
 - If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
