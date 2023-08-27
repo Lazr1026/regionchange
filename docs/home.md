@@ -54,10 +54,9 @@ type=eth
 1. Complete initial setup.
    - You will see duplicate titles. This is normal as the titles from the original region are still installed.
 1. Get back into recovery_menu and start wupserver again.
-1. Insert `yeet_titles('REGION')` into the CLI.
-   - Replace `REGION` with the consoles original region.
+1. Insert `Insert remove_system_titles('REGION')` into the CLI. into the CLI.
+   - Replace `REGION` with the consoles original region (USA, EUR, or JPN).
 1. Wait for the old titles to be removed.
-1. Once finished, Insert `flush_mlc()` into the CLI.
 1. Exit wupclient (`exit()`).
 1. Press a button on the wiiu to shut down wupserver and go to `Shutdown`.
 
