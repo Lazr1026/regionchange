@@ -35,7 +35,7 @@ type=eth
 1. Load the recovery_menu with UDPIH.
 1. Navigate to "Load Network Configuration" and press a button to exit back to the main menu.
 1. Start wupserver in the recovery_menu.
-1. Edit the `wupclient.py` file in a text editor and change the IP on line 30 with the one for your console. Do not change the port.
+1. Edit the `wupclient.py` file in a text editor and change the IP on line 140 with the one for your console. Do not change the port.
 1. Open the command line/terminal where you saved `wupclient.py`.
 1. Windows: `py -3 -i wupclient.py` macOS/Linux: `python3 -i wupclient.py`.
 1. Insert `w.dl("/vol/system/config/sys_prod.xml")` into the CLI.
