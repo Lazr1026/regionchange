@@ -1078,6 +1078,11 @@ class RegionChanger(object):
         if inp == '4' or inp.upper() == 'EUR':
             return (4, 'EUR')
 
+    def get_sys_prod_region_or_ask(self, msg='Enter the original region (1 = JPN, 2 = USA, 4 = EUR): '):
+        if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
+            return self.get_region(self._sys_prod['product_area'])
+        return self.ask_region(msg)
+
     def ask_region(self, msg='Enter the desired region (1 = JPN, 2 = USA, 4 = EUR): '):
         region = self.get_region(input(msg))
         if not region:
@@ -1113,10 +1118,7 @@ class RegionChanger(object):
         w = self.wup_client
         w.dl(self.COOLBOOT_PATH)
         if (sys_xml := read_file('system.xml')) is not None:
-            if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
-                region = self.get_region(self._sys_prod['product_area'])
-            else:
-                region = self.ask_region('Enter the original region (1 = JPN, 2 = USA, 4 = EUR): ')
+            region = self.get_sys_prod_region_or_ask()
             coldboot_title = {
                 'JPN':'0005001010047000',
                 'USA':'0005001010047100',
@@ -1132,10 +1134,7 @@ class RegionChanger(object):
     def system_titles_remover(self, auto_flush=True):
         if not ask_yes_no('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
             return None
-        if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
-            region = self.get_region(self._sys_prod['product_area'])
-        else:
-            region = self.ask_region('Enter the original region (1 = JPN, 2 = USA, 4 = EUR): ')
+        region = self.get_sys_prod_region_or_ask()
         if (titles := SYSTEM_TITLES.get(region[1])) is not None and isinstance(titles, (tuple, list)):
             w = self.wup_client
             for t in titles:
