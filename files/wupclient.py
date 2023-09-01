@@ -1102,6 +1102,13 @@ class RegionChanger(object):
         w.rmdir(update_folder)
         w.mkdir(update_folder, flags)
 
+    def _has_payload_loader_payload(self, obj):
+        return re_findall(obj, r'">(.*)</default_title_id>') in (
+            '000500101004E000',#Health and Safety Information JPN
+            '000500101004E100',#Health and Safety Information USA
+            '000500101004E200',#Health and Safety Information EUR
+        )
+
     def set_system_setting_as_coldboot(self):
         w = self.wup_client
         w.dl(self.COOLBOOT_PATH)
@@ -1115,7 +1122,7 @@ class RegionChanger(object):
                 'USA':'0005001010047100',
                 'EUR':'0005001010047200',
             }.get(region[1])
-            #000500101004E000/000500101004E100/000500101004E200 means PayloadLoaderPayload
+            #self._has_payload_loader_payload(sys_xml)
             sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title}</default_title_id>')
             write_file(sys_xml, 'system_edited.xml')
             if os.path.exists('system_edited.xml'):
