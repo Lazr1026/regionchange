@@ -1037,6 +1037,7 @@ class RegionChanger(object):
     REGION_HAX = 119
     SYS_PROD_PATH = '/vol/system/config/sys_prod.xml'
     DRC_CONFIG_PATH = '/vol/system/proc/prefs/DRCCfg.xml'
+    COOLBOOT_PATH = '/vol/system/config/system.xml'
 
     #def __init__(self, *args, **kwargs): pass
 
@@ -1047,7 +1048,7 @@ class RegionChanger(object):
         return self._wup_ip
 
     @wup_ip.setter
-     def wup_ip(self, value):
+    def wup_ip(self, value):
          if self.IP_REGEX.match(self._wup_ip):
             self._wup_ip = value
 
@@ -1100,6 +1101,25 @@ class RegionChanger(object):
         update_folder = f'{w.cwd}/sys/update'
         w.rmdir(update_folder)
         w.mkdir(update_folder, flags)
+
+    def set_system_setting_as_coldboot(self):
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None:
+            if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
+                region = self.get_region(self._sys_prod['product_area'])
+            else:
+                region = self.ask_region('Enter the original region (1 = JPN, 2 = USA, 4 = EUR): ')
+            coldboot_title = {
+                'JPN':'0005001010047000',
+                'USA':'0005001010047100',
+                'EUR':'0005001010047200',
+            }.get(region[1])
+            #000500101004E000/000500101004E100/000500101004E200 means PayloadLoaderPayload
+            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title}</default_title_id>')
+            write_file(sys_xml, 'system_edited.xml')
+            if os.path.exists('system_edited.xml'):
+                w.up('system_edited.xml', self.COOLBOOT_PATH)
 
     def system_titles_remover(self, auto_flush=True):
         if not ask_yes_no('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
@@ -1157,6 +1177,9 @@ def main():
             #Remove System titles
             region_charger.system_titles_remover()
         elif choose == '4':
+            #Set System Setting as coldboot title
+            region_charger.set_system_setting_as_coldboot()
+        elif choose == '9':
             #Change WUP Server IP
             region_charger._wup_ip = region_charger.ask_wup_ip()
     exit()
