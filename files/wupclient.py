@@ -1049,7 +1049,7 @@ class RegionChanger(object):
 
     @wup_ip.setter
     def wup_ip(self, value):
-         if self.IP_REGEX.match(self._wup_ip):
+         if self.IP_REGEX.match(value):
             self._wup_ip = value
 
     @property
@@ -1106,6 +1106,7 @@ class RegionChanger(object):
         update_folder = f'{w.cwd}/sys/update'
         w.rmdir(update_folder)
         w.mkdir(update_folder, flags)
+        self.flush_mlc()
 
     def _has_payload_loader_payload(self, obj):
         return re_findall(obj, r'">(.*)</default_title_id>') in (
@@ -1182,10 +1183,8 @@ MENU = '''--------------- MENU ---------------
 > Input your choose: '''
 
 def main():
-    choose = ''
     region_charger = RegionChanger()
-    while choose != '0':
-        choose = input(MENU)
+    while (choose := input(MENU)) != '0':
         if choose == '1':
             #Change Region & Remove System Titles
             region_charger.wiiu_region_changer()
