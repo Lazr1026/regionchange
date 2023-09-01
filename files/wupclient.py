@@ -31,7 +31,7 @@ class WupClient:
     s = None
 
     def __init__(self, ip, port=1337):
-        self.s=socket.socket()
+        self.s = socket.socket()
         self.s.connect((ip, port))
         self.fsa_handle = self.open('/dev/fsa', 0)
         self.cwd = '/vol/storage_mlc01'
@@ -1037,8 +1037,6 @@ class RegionChanger(object):
     REGION_HAX = 119
     SYS_PROD_PATH = '/vol/system/config/sys_prod.xml'
     DRC_CONFIG_PATH = '/vol/system/proc/prefs/DRCCfg.xml'
-    STORAGE_MLC_PATH = f'/vol/storage_mlc01/sys/title/'
-    UPDATE_FOLDER_PATH = f'/vol/storage_mlc01/sys/update'
 
     #def __init__(self, *args, **kwargs): pass
 
@@ -1099,8 +1097,9 @@ class RegionChanger(object):
 
     def create_update_folder(self, flags=0x0777):
         w = self.wup_client
-        w.rmdir(self.UPDATE_FOLDER_PATH)
-        w.mkdir(self.UPDATE_FOLDER_PATH, flags)
+        update_folder = f'{w.cwd}/sys/update'
+        w.rmdir(update_folder)
+        w.mkdir(update_folder, flags)
 
     def system_titles_remover(self, auto_flush=True):
         if not ask_yes_no('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
@@ -1112,7 +1111,7 @@ class RegionChanger(object):
         if (titles := SYSTEM_TITLES.get(region[1])) is not None and isinstance(titles, (tuple, list)):
             w = self.wup_client
             for t in titles:
-                w.rmdir(self.STORAGE_MLC_PATH + t.replace('-', '/'))
+                w.rmdir(f"{w.cwd}/sys/title/{t.replace('-', '/')}")
             if auto_flush:
                 self.flush_mlc
 
@@ -1128,8 +1127,8 @@ class RegionChanger(object):
             if os.path.exists('sys_prod_edited.xml'):
                 w.up('sys_prod_edited.xml', self.SYS_PROD_PATH)
                 #self.create_update_folder()
-                #self.flush_mlc()
                 #self.system_titles_remover()
+                #self.flush_mlc()
                 #self.force_restart()
 
     def gamepad_update_remover(self, version_check_flag=0):
