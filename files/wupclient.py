@@ -1122,7 +1122,8 @@ class RegionChanger(object):
                 'USA':'0005001010047100',
                 'EUR':'0005001010047200',
             }.get(region[1])
-            #self._has_payload_loader_payload(sys_xml)
+            if self._has_payload_loader_payload(sys_xml) and not ask_yes_no('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
+                return None
             sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title}</default_title_id>')
             write_file(sys_xml, 'system_edited.xml')
             if os.path.exists('system_edited.xml'):
