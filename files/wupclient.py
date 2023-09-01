@@ -1170,11 +1170,23 @@ class RegionChanger(object):
             if os.path.exists('DRCCfg_edited.xml'):
                 w.up('DRCCfg_edited.xml', self.DRC_CONFIG_PATH)
 
+MENU = '''--------------- MENU ---------------
+1. Wii U Region Changer
+2. Gamepad Update Remover
+3. Set System Setting as Cooldboot
+4. Old System Titles Remover
+
+9. Change WUP Server IP
+
+0. Exit
+
+> Input your choose: '''
+
 def main():
     choose = ''
     region_charger = RegionChanger()
     while choose != '0':
-        choose = input('Input your choose:')
+        choose = input(MENU)
         if choose == '1':
             #Change Region & Remove System Titles
             region_charger.wiiu_region_changer()
@@ -1182,11 +1194,11 @@ def main():
             #Remove Gamepad Update
             region_charger.gamepad_update_remover()
         elif choose == '3':
-            #Remove System titles
-            region_charger.system_titles_remover()
-        elif choose == '4':
             #Set System Setting as coldboot title
             region_charger.set_system_setting_as_coldboot()
+        elif choose == '4':
+            #Remove System titles
+            region_charger.system_titles_remover()
         elif choose == '9':
             #Change WUP Server IP
             region_charger._wup_ip = region_charger.ask_wup_ip()
