@@ -1104,10 +1104,10 @@ class RegionChanger(object):
             if 'model_number' in obj and (model := self.MODEL_NUMBER_REGEX.match(obj['model_number']['value'])) is not None:
                 model = model.groupdict()
                 if isinstance(model, dict) and 'region' in model and model['region']:
-                    return guess_original_region(model['region'])
+                    return self.guess_original_region(model['region'])
             if 'code_id' in obj and len(obj['code_id']['value'][0:2]) == 2:
-                return guess_original_region(obj['code_id']['value'][1])
-            return guess_original_region(obj['product_area']['value'])
+                return self.guess_original_region(obj['code_id']['value'][1])
+            return self.guess_original_region(obj['product_area']['value'])
         if obj.upper() in ('1', '01', 'J', 'JPN'):
             return (1, 'JPN')
         if obj.upper() in ('2', '02', '12', '14', 'B', 'BRA', 'M', 'U', 'USA', 'W'):
