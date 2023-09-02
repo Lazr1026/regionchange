@@ -1105,7 +1105,7 @@ class RegionChanger(object):
                     return self.guess_original_region(model['region'])
             if 'code_id' in obj and len(obj['code_id']['value'][0:2]) == 2:
                 return self.guess_original_region(obj['code_id']['value'][1])
-            return self.guess_original_region(obj['product_area']['value'])
+            #return self.guess_original_region(obj['product_area']['value'])
         if obj.upper() in ('1', '01', 'J', 'JPN'):
             return (1, 'JPN')
         if obj.upper() in ('2', '02', '12', '14', 'B', 'BRA', 'M', 'U', 'USA', 'W'):
@@ -1114,8 +1114,8 @@ class RegionChanger(object):
             return (4, 'EUR')
 
     def get_sys_prod_region_or_ask(self, msg='Enter the original region (1 = JPN, 2 = USA, 4 = EUR): '):
-        if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
-            return self.guess_original_region(self._sys_prod)
+        if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and (r := self.guess_original_region(self._sys_prod)) is not None:
+            return r
         return self.ask_region(msg)
 
     def ask_region(self, msg='Enter the desired region (1 = JPN, 2 = USA, 4 = EUR): '):
