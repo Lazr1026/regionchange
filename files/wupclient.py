@@ -376,7 +376,7 @@ class WupClient:
     def mkdir(self, path, flags):
         if path[0] != '/':
             path = self.cwd + '/' + path
-        ret = w.FSA_MakeDir(self.fsa_handle, path, flags)
+        ret = self.FSA_MakeDir(self.fsa_handle, path, flags)
         if ret == 0:
             return 0
         print('mkdir error (%s, %08X)' % (path, ret))
@@ -1138,7 +1138,7 @@ class RegionChanger(object):
         w.svc_and_exit(0x72, [1])
         self.close()
 
-    def create_update_folder(self, flags=0x0777):
+    def create_update_folder(self, flags=0x777):
         w = self.wup_client
         update_folder = f'{w.cwd}/sys/update'
         w.rmdir(update_folder)
@@ -1209,7 +1209,8 @@ MENU = '''--------------- MENU ---------------
 1. Wii U Region Changer
 2. Gamepad Update Remover
 3. Set System Setting as Cooldboot
-4. Old System Titles Remover
+4. (Re)create Update folder
+5. Old System Titles Remover
 
 9. Change WUP Server IP
 
@@ -1231,6 +1232,9 @@ def main():
             #Set System Setting as coldboot title
             region_charger.set_system_setting_as_coldboot()
         elif choose == '4':
+            #Remove System titles
+            region_charger.create_update_folder()
+        elif choose == '5':
             #Remove System titles
             region_charger.system_titles_remover()
         elif choose == '9':
