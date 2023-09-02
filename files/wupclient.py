@@ -1222,8 +1222,7 @@ MENU = '''--------------- MENU ---------------
 
 > Input your choose: '''
 
-MENU = '''--------------- [TITLE] ---------------
-> Press Y for continue or B for back: '''
+#MENU = '''--------------- [TITLE] ---------------> Press Y for continue or B for back: '''
 
 def main():
     '''Edit sys_prod, edit system.xml, create update, flush mlc and restart'''
