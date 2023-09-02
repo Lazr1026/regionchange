@@ -385,7 +385,7 @@ class WupClient:
     def chmod(self, filename, flags):
         if filename[0] != '/':
             filename = self.cwd + '/' + filename
-        ret = w.FSA_ChangeMode(self.fsa_handle, filename, flags)
+        ret = self.FSA_ChangeMode(self.fsa_handle, filename, flags)
         print('chmod returned : ' + hex(ret))
 
     def cd(self, path):
@@ -593,13 +593,11 @@ class WupClient:
         ret = self.FSA_CloseFile(self.fsa_handle, file_handle)
 
     def askyesno(self):
-        yes = set(['yes', 'ye', 'y'])
-        no = set(['no','n', ''])
         while True:
             choice = input().lower()
-            if choice in yes:
+            if choice in ('yes', 'ye', 'y'):
                return True
-            elif choice in no:
+            elif choice in ('no','n', ''):
                return False
             else:
                print("Please respond with 'y' or 'n'")
