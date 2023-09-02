@@ -619,7 +619,7 @@ class WupClient:
 
     # Credits to Nightkingale at https://nightkingale.com/posts/the-downgrade-of-doom
     def rmdir(self, path):
-        fsa_handle = w.fsa_handle
+        fsa_handle = self.fsa_handle
         if path[0] != '/':
             path = self.cwd + '/' + path
         ret, dir_handle = self.FSA_OpenDir(fsa_handle, path)
@@ -1186,14 +1186,12 @@ class RegionChanger(object):
         if (sys_prod := read_file('sys_prod.xml')) is not None:
             game_region = self.ask_region()
             self._sys_prod = extract_sys_prod(sys_prod)
-            sys_prod = re_sub(sys_prod, r'">[^/]</product_area>', f'">{self.REGION_HAX}</product_area>')
-            sys_prod = re_sub(sys_prod, r'">[^/]</game_region>', f'">{game_region[0]}</game_region>')
+            sys_prod = re_sub(sys_prod, r'">[^/]</product_area>', f'">{game_region[0]}</product_area>')
+            sys_prod = re_sub(sys_prod, r'">[^/]</game_region>', f'">{self.REGION_HAX}</game_region>')
             write_file(sys_prod, 'sys_prod_edited.xml')
             if os.path.exists('sys_prod_edited.xml'):
                 w.up('sys_prod_edited.xml', self.SYS_PROD_PATH)
                 #self.create_update_folder()
-                #self.system_titles_remover()
-                #self.flush_mlc()
                 #self.force_restart()
 
     def gamepad_update_remover(self, version_check_flag=0):
@@ -1220,6 +1218,7 @@ MENU = '''--------------- MENU ---------------
 > Input your choose: '''
 
 def main():
+    '''Edit sys_prod, edit system.xml, create update, flush mlc and restart'''
     region_charger = RegionChanger()
     while (choose := input(MENU)) != '0':
         if choose == '1':
@@ -1237,7 +1236,6 @@ def main():
         elif choose == '9':
             #Change WUP Server IP
             region_charger._wup_ip = region_charger.ask_wup_ip()
-    exit()
 
 if __name__ == '__main__':
     main()
