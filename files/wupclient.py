@@ -933,8 +933,8 @@ def create_wupclient(ip_address, max_retries=3):
         else:
             return w
 
-def ask_yes_no(msg):
-    return input(msg).lower() in ('yes', 'ye', 'y')
+def ask_and_boolify(msg, values=('1', 'ok', 'on', 't', 'true', 'yes', 'ye', 'y', '')):
+    return input(msg).lower() in values
 
 SYSTEM_TITLES = {
     'JPN':[
@@ -1151,24 +1151,25 @@ class RegionChanger(object):
         )
 
     def set_system_setting_as_coldboot(self):
+        #Check if there are any System Setting installed before setting this
         w = self.wup_client
         w.dl(self.COOLBOOT_PATH)
         if (sys_xml := read_file('system.xml')) is not None:
             region = self.get_sys_prod_region_or_ask()
             coldboot_title = {
-                'JPN':'0005001010047000',
-                'USA':'0005001010047100',
-                'EUR':'0005001010047200',
+                'JPN':'00050010-10047000',
+                'USA':'00050010-10047100',
+                'EUR':'00050010-10047200',
             }.get(region[1])
-            if self._has_payload_loader_payload(sys_xml) and not ask_yes_no('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
+            if w.cd(f'{w.cwd}/usr/title/{coldboot_title.replace("-", "/")}') < 0 or self._has_payload_loader_payload(sys_xml) and not ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
                 return None
-            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title}</default_title_id>')
+            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title.replace("-", "")}</default_title_id>')
             write_file(sys_xml, 'system_edited.xml')
             if os.path.exists('system_edited.xml'):
                 w.up('system_edited.xml', self.COOLBOOT_PATH)
 
     def system_titles_remover(self, auto_flush=True):
-        if not ask_yes_no('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
+        if not ask_and_boolify('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
             return None
         region = self.get_sys_prod_region_or_ask()
         if (titles := SYSTEM_TITLES.get(region[1])) is not None and isinstance(titles, (tuple, list)):
@@ -1193,7 +1194,7 @@ class RegionChanger(object):
                 #self.force_restart()
 
     def gamepad_update_remover(self, version_check_flag=0):
-        if not ask_yes_no('WARNING: Are you sure you want to remove the Gamepad update? (Y)es or (N)o'):
+        if not ask_and_boolify('WARNING: Are you sure you want to remove the Gamepad update? (Y)es or (N)o'):
             return None
         w = self.wup_client
         w.dl(self.DRC_CONFIG_PATH)
@@ -1202,6 +1203,11 @@ class RegionChanger(object):
             write_file(drc_config, 'DRCCfg_edited.xml')
             if os.path.exists('DRCCfg_edited.xml'):
                 w.up('DRCCfg_edited.xml', self.DRC_CONFIG_PATH)
+
+def inc_dec(b):
+    if not b:
+        return -1
+    return 1
 
 MENU = '''--------------- MENU ---------------
 1. Wii U Region Changer
@@ -1216,9 +1222,25 @@ MENU = '''--------------- MENU ---------------
 
 > Input your choose: '''
 
+MENU = '''--------------- [TITLE] ---------------
+> Press Y for continue or B for back: '''
+
 def main():
     '''Edit sys_prod, edit system.xml, create update, flush mlc and restart'''
     region_charger = RegionChanger()
+    """
+    menu_options = (
+        {'title':'Wii U Region Changer', 'meth':region_charger.wiiu_region_changer}, #Change Region & Remove System Titles
+        {'title':'Gamepad Update Remover', 'meth':region_charger.gamepad_update_remover}, #Remove Gamepad Update
+        {'title':'Set System Setting as Cooldboot', 'meth':region_charger.set_system_setting_as_coldboot}, #Set System Setting as coldboot title
+        {'title':'(Re)create Update folder', 'meth':region_charger.create_update_folder}, #(Re)create Update folder
+        {'title':'Old System Titles Remover', 'meth':region_charger.system_titles_remover}, #Remove System titles
+        {'title':'Change WUP Server IP', 'meth':region_charger.ask_wup_ip}, #Change WUP Server IP
+    )
+    choose = 0
+    while 0 <= choose < len(menu_options):
+        choose += inc_dec(ask_and_boolify(f"{choose} - {MENU.replace('TITLE', menu_options[choose]['title'])}"))
+    """
     while (choose := input(MENU)) != '0':
         if choose == '1':
             #Change Region & Remove System Titles
