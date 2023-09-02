@@ -1161,7 +1161,7 @@ class RegionChanger(object):
                 'USA':'00050010-10047100',
                 'EUR':'00050010-10047200',
             }.get(region[1])
-            if w.cd(f'{w.cwd}/usr/title/{coldboot_title.replace("-", "/")}') < 0 or self._has_payload_loader_payload(sys_xml) and not ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
+            if w.cd(f'{w.cwd}/sys/title/{coldboot_title.replace("-", "/")}') < 0 or self._has_payload_loader_payload(sys_xml) and not ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
                 return None
             sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title.replace("-", "")}</default_title_id>')
             write_file(sys_xml, 'system_edited.xml')
