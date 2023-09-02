@@ -1097,7 +1097,7 @@ class RegionChanger(object):
             code_id contains GW || GB (BRA) || FW || FM || FU 
             model_number equals WUP-001(02) || WUP-001(14) || WUP-101(02) || WUP-901(02)
         Kiosk:
-            WIS-001 || WUT-001 || WUT-002
+            WIS-001 || WUT-001 || WUT-002 || WUT-011
         Based on: https://wiiu.gerbilsoft.com/?sort=system_model
         '''
         if isinstance(obj, dict) and 'model_number' in obj or 'code_id' in obj or 'product_area' in obj:
