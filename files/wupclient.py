@@ -1046,7 +1046,10 @@ SYSTEM_TITLES = {
 
 class RegionChanger(object):
     IP_REGEX = re.compile(r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+    MODEL_NUMBER_REGEX = re.compile(r'^(?P<wup>[A-Z]{3}+)-(?P<id>[0-9]{0,3}+)?(\()?(?P<region>[0-9]{0,3}+)?(\))?')
+
     REGION_HAX = 119
+
     SYS_PROD_PATH = '/vol/system/config/sys_prod.xml'
     DRC_CONFIG_PATH = '/vol/system/proc/prefs/DRCCfg.xml'
     COOLBOOT_PATH = '/vol/system/config/system.xml'
@@ -1082,21 +1085,43 @@ class RegionChanger(object):
         print(f'IP address set: {ip}')
         return ip
 
-    def get_region(self, inp):
-        if inp == '1' or inp.upper() == 'JPN':
+    def guess_original_region(self, obj):
+        '''
+        JPN:
+            code_id contains GJ || FJ
+            model_number equals WUP-001(01) || WUP-101(01)
+        EUR:
+            code_id contains GE || GA (AUS) || FE
+            model_number equals WUP-001(03) || WUP-001(04) || WUP-101(03) || WUP-101(04)
+        USA:
+            code_id contains GW || GB (BRA) || FW || FM || FU 
+            model_number equals WUP-001(02) || WUP-001(14) || WUP-101(02) || WUP-901(02)
+        Kiosk:
+            WIS-001 || WUT-001 || WUT-002
+        Based on: https://wiiu.gerbilsoft.com/?sort=system_model
+        '''
+        if isinstance(obj, dict) and 'model_number' in obj or 'code_id' in obj or 'product_area' in obj:
+            if 'model_number' in obj and (model := self.MODEL_NUMBER_REGEX.match(obj['model_number']['value'])) is not None:
+                model = model.groupdict()
+                if isinstance(model, dict) and 'region' in model and model['region']:
+                    return guess_original_region(model['region'])
+            if 'code_id' in obj and len(obj['code_id']['value'][0:2]) == 2:
+                return guess_original_region(obj['code_id']['value'][1])
+            return guess_original_region(obj['product_area']['value'])
+        if obj.upper() in ('1', '01', 'J', 'JPN'):
             return (1, 'JPN')
-        if inp == '2' or inp.upper() == 'USA':
+        if obj.upper() in ('2', '02', '12', '14', 'B', 'BRA', 'M', 'U', 'USA', 'W'):
             return (2, 'USA')
-        if inp == '4' or inp.upper() == 'EUR':
+        if obj.upper() in ('4', '04', '3', '03', 'A', 'AUS', 'E', 'EUR'):
             return (4, 'EUR')
 
     def get_sys_prod_region_or_ask(self, msg='Enter the original region (1 = JPN, 2 = USA, 4 = EUR): '):
         if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
-            return self.get_region(self._sys_prod['product_area']['value'])
+            return self.guess_original_region(self._sys_prod)
         return self.ask_region(msg)
 
     def ask_region(self, msg='Enter the desired region (1 = JPN, 2 = USA, 4 = EUR): '):
-        region = self.get_region(input(msg))
+        region = self.guess_original_region(input(msg))
         if not region:
             return self.ask_region()
         return region
