@@ -890,14 +890,26 @@ def re_sub(obj, regex, new):
     return re.sub(regex, new, obj)
 
 def extract_sys_prod(obj):
-    sys_prod_regex = re.compile(r'<product_area[^/]+</product_area>')
     sys_prod = {}
-    if sys_prod_regex.search(obj):
-        _ = sys_prod_regex.findall(obj)[0]
-        sys_prod['product_area'] = re_findall(_, r'">(.*)</product_area>')
-        sys_prod['type'] = re_findall(_, r'type="(.*)" l')
-        sys_prod['length'] = re_findall(_, r'length="(.*)" a')
-        sys_prod['access'] = re_findall(_, r'access="(.*)">')
+    for f in (
+        'version',
+        'eeprom_version',
+        'product_area',
+        'game_region',
+        'ntsc_pal',
+        '5ghz_country_code',
+        '5ghz_country_code_revision',
+        'code_id',
+        'serial_id',
+        'model_number',
+    ):
+        if (_ := re_findall(obj, f'<{f}[^/]+</{f}>')) is not None:
+            sys_prod[f] = {
+                'value':re_findall(_, f'">(.*)</{f}>'),
+                'type':re_findall(_, r'type="(.*)" l'),
+                'length':re_findall(_, r'length="(.*)" a'),
+                'access':re_findall(_, r'access="(.*)">'),
+            }
     return sys_prod
 
 def read_file(path, mode='r+'):
@@ -1080,7 +1092,7 @@ class RegionChanger(object):
 
     def get_sys_prod_region_or_ask(self, msg='Enter the original region (1 = JPN, 2 = USA, 4 = EUR): '):
         if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and 'product_area' in self._sys_prod:
-            return self.get_region(self._sys_prod['product_area'])
+            return self.get_region(self._sys_prod['product_area']['value'])
         return self.ask_region(msg)
 
     def ask_region(self, msg='Enter the desired region (1 = JPN, 2 = USA, 4 = EUR): '):
