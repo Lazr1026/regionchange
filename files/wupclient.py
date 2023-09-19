@@ -33,11 +33,23 @@ class WupClient:
     def __init__(self, ip, port=1337):
         self.s = socket.socket()
         self.s.connect((ip, port))
-        self.fsa_handle = self.open('/dev/fsa', 0)
-        self.cwd = '/vol/storage_mlc01'
 
+    @property
+    def fsa_handle(self):
+        if not hasattr(self, '_fsa_handle') or not self._fsa_handle:
+            self._fsa_handle = self.open('/dev/fsa', 0)
+        return self._fsa_handle
+
+    @property
+    def cwd(self):
+        return '/vol/storage_mlc01'
+
+    @property
+    def sd_card(self):
+        return '/vol/storage_sdcard'
+    
     def __del__(self):
-        self.FSA_Unmount(self.fsa_handle, '/vol/storage_sdcard', 2)
+        self.FSA_Unmount(self.fsa_handle, self.sd_card, 2)
         self.close(self.fsa_handle)
 
     # fundamental comms
@@ -373,6 +385,24 @@ class WupClient:
             # else:
             print(data.decode('ascii'))
 
+    def flush_mlc(self):
+        print('Flushing MLC')
+        ret = self.FSA_FlushVolume(self.fsa_handle, self.cwd)
+        return hex(ret)
+
+    def create_update_folder(self, auto_flush=False, flags=0x777):
+        update_folder = f'{self.cwd}/sys/update'
+        self.rmdir(update_folder)
+        self.mkdir(update_folder, flags)
+        if auto_flush:
+            self.flush_mlc()
+
+    def force_restart(self):
+        self.svc_and_exit(0x72, [1])
+
+    def force_shutdown(self):
+        self.svc_and_exit(0x72, [0])
+
     def mkdir(self, path, flags):
         if path[0] != '/':
             path = self.cwd + '/' + path
@@ -386,7 +416,7 @@ class WupClient:
         if filename[0] != '/':
             filename = self.cwd + '/' + filename
         ret = self.FSA_ChangeMode(self.fsa_handle, filename, flags)
-        print('chmod returned : ' + hex(ret))
+        print('chmod returned: ' + hex(ret))
 
     def cd(self, path):
         if path[0] != '/' and self.cwd[0] == '/':
@@ -396,7 +426,7 @@ class WupClient:
             self.cwd = path
             self.FSA_CloseDir(self.fsa_handle, dir_handle)
             return 0
-        print('cd error : path does not exist (%s)' % (path))
+        print('cd error: path does not exist (%s)' % (path))
         return -1
 
     def ls(self, path=None, return_data=False):
@@ -404,7 +434,7 @@ class WupClient:
             path = self.cwd + '/' + path
         ret, dir_handle = self.FSA_OpenDir(self.fsa_handle, path if path is not None else self.cwd)
         if ret != 0x0:
-            print('opendir error : ' + hex(ret))
+            print('opendir error: ' + hex(ret))
             return [] if return_data else None
         entries = []
         while True:
@@ -447,9 +477,6 @@ class WupClient:
                 self.mkdir(_dstpath, 0x600)
                 entries = self.ls(_srcpath, True)
                 q += [(_srcpath, _dstpath, e) for e in entries]
-
-    def pwd(self):
-        return self.cwd
 
     def cp(self, filename_in, filename_out):
         ret, in_file_handle = self.FSA_OpenFile(self.fsa_handle, filename_in, 'r')
@@ -1083,8 +1110,23 @@ class RegionChanger(object):
         print(f'IP address set: {ip}')
         return ip
 
+    def check_serial_id(self, serial_id, *, mult=3, mod=10):
+        serial_id = re.sub('[a-zA-Z]', '', serial_id)
+        odds, evens = 0, 0
+        for i in range(len(serial_id[:-1])):
+            n = int(serial_id[i])
+            if i % 2 == 0:
+                odds += n
+            else:
+                evens += n
+        _ = ((mult * evens) + odds) % mod
+        return len(serial_id) == 9 and _ is not 0 and mod - _ == int(serial_id[-1:])
+
     def guess_original_region(self, obj):
         '''
+        First letter represents the model:
+            F is 32GB
+            G is 8GB
         JPN:
             code_id contains GJ || FJ
             model_number equals WUP-001(01) || WUP-101(01)
@@ -1095,10 +1137,12 @@ class RegionChanger(object):
             code_id contains GW || GB (BRA) || FW || FM || FU 
             model_number equals WUP-001(02) || WUP-001(14) || WUP-101(02) || WUP-901(02)
         Kiosk:
-            WIS-001 || WUT-001 || WUT-002 || WUT-011
-        Based on: https://wiiu.gerbilsoft.com/?sort=system_model
+            WIS-001 || WIS-002 || WIS-003 || WUT-001 || WUT-002 || WUT-011
+        Based on:
+        https://wiiubrew.org/wiki/Product_Information#Prefix
+        https://wiiu.gerbilsoft.com/?sort=system_model
         '''
-        if isinstance(obj, dict) and 'model_number' in obj or 'code_id' in obj or 'product_area' in obj:
+        if isinstance(obj, dict) and ('model_number' in obj or 'code_id' in obj or 'product_area' in obj) and ('serial_id' in obj and self.check_serial_id(obj['serial_id'])):
             if 'model_number' in obj and (model := self.MODEL_NUMBER_REGEX.match(obj['model_number']['value'])) is not None:
                 model = model.groupdict()
                 if isinstance(model, dict) and 'region' in model and model['region']:
@@ -1124,24 +1168,12 @@ class RegionChanger(object):
             return self.ask_region()
         return region
 
-    def flush_mlc(self):
-        w = self.wup_client
-        print('Flushing MLC')
-        ret = w.FSA_FlushVolume(w.fsa_handle, w.cwd)
-        print(hex(ret))
-
-    def force_restart(self):
-        w = self.wup_client
-        print('Restarting Wii U')
-        w.svc_and_exit(0x72, [1])
-        self.close()
-
     def create_update_folder(self, flags=0x777):
         w = self.wup_client
         update_folder = f'{w.cwd}/sys/update'
         w.rmdir(update_folder)
         w.mkdir(update_folder, flags)
-        self.flush_mlc()
+        w.flush_mlc()
 
     def _has_payload_loader_payload(self, obj):
         return re_findall(obj, r'">(.*)</default_title_id>') in (
@@ -1150,23 +1182,41 @@ class RegionChanger(object):
             '000500101004E200',#Health and Safety Information EUR
         )
 
+    def overwrite_payload_loader_payload(self, sys_xml):
+        p = self._has_payload_loader_payload(sys_xml)
+        return not p or p and ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o')
+
+    def set_title_as_coldboot(self, title_id):
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None and w.cd(f'{w.cwd}/sys/title/{title_id.replace("-", "/")}') > -1 and overwrite_payload_loader_payload(sys_xml):
+            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title.replace("-", "")}</default_title_id>')
+            write_file(sys_xml, 'system_edited.xml')
+            if os.path.exists('system_edited.xml'):
+                w.up('system_edited.xml', self.COOLBOOT_PATH)
+
+    def set_wiiu_menu_as_coldboot(self):
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None:
+            region = self.get_sys_prod_region_or_ask()
+            self.set_title_as_coldboot({
+                'JPN':'00050010-10040000',
+                'USA':'00050010-10040100',
+                'EUR':'00050010-10040200',
+            }.get(region[1]))
+
     def set_system_setting_as_coldboot(self):
         #Check if there are any System Setting installed before setting this
         w = self.wup_client
         w.dl(self.COOLBOOT_PATH)
         if (sys_xml := read_file('system.xml')) is not None:
             region = self.get_sys_prod_region_or_ask()
-            coldboot_title = {
+            self.set_title_as_coldboot({
                 'JPN':'00050010-10047000',
                 'USA':'00050010-10047100',
                 'EUR':'00050010-10047200',
-            }.get(region[1])
-            if w.cd(f'{w.cwd}/sys/title/{coldboot_title.replace("-", "/")}') < 0 or self._has_payload_loader_payload(sys_xml) and not ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o'):
-                return None
-            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title.replace("-", "")}</default_title_id>')
-            write_file(sys_xml, 'system_edited.xml')
-            if os.path.exists('system_edited.xml'):
-                w.up('system_edited.xml', self.COOLBOOT_PATH)
+            }.get(region[1]))
 
     def system_titles_remover(self, auto_flush=True):
         if not ask_and_boolify('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
@@ -1177,7 +1227,7 @@ class RegionChanger(object):
             for t in titles:
                 w.rmdir(f"{w.cwd}/sys/title/{t.replace('-', '/')}")
             if auto_flush:
-                self.flush_mlc
+                w.flush_mlc()
 
     def wiiu_region_changer(self):
         w = self.wup_client
@@ -1191,7 +1241,7 @@ class RegionChanger(object):
             if os.path.exists('sys_prod_edited.xml'):
                 w.up('sys_prod_edited.xml', self.SYS_PROD_PATH)
                 #self.create_update_folder()
-                #self.force_restart()
+                #w.force_restart()
 
     def gamepad_update_remover(self, version_check_flag=0):
         if not ask_and_boolify('WARNING: Are you sure you want to remove the Gamepad update? (Y)es or (N)o'):
