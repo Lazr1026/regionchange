@@ -1,17 +1,17 @@
-# PLEASE READ!
+# PLEASE READ! {docsify-ignore}
 
 !> This guide is now outdated. Please follow the new guide on GBATemp [here](https://gbatemp.net/threads/650802/).
 
 <details>
-<summary>Click here for the guide despite the notice above.</summary>
-	
-## Notes
+<summary>Click here for the original guide despite the notice above.</summary>
+
+## Notes {docsify-ignore}
 - You lose eshop access but game updates do still work.
 - If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
 - Unblock updates with UFDiine before following this guide (if you dont re-create the update folder it will bite you in the ass later in the guide).
 - That being said, be careful and have a NAND Backup just in case. I am not responsible if you fuck up your system.
 
-## What you need:
+## What you need: {docsify-ignore}
 - A Brain, a large one at that.
 - A way to run [UDPIH](https://github.com/GaryOderNichts/udpih) to be able to run the recovery_menu. You *might* be able to do this without it but dont take your chances.
 - A modified [recovery_menu](https://raw.githubusercontent.com/Lazr1026/regionchange/main/files/recovery_menu). ([Source](https://github.com/Lazr1026/recovery_menu))
@@ -20,7 +20,7 @@
 - A text editor. Notepad will be fine
 - If you need help, join [my server](https://discord.gg/HNDcTEkcR3) and ask in `#help`.
 
-## Region Changing
+## Region Changing {docsify-ignore}
 1. Create a file on the root of your sd named `network.cfg` and insert the following into it:
 	- If using a wifi connection (obviously replace `ssid` and `key` with what they should be):
 ```
@@ -63,7 +63,7 @@ type=eth
 1. Exit wupclient (`exit()`).
 1. Press a button on the wiiu to shut down wupserver and go to `Shutdown`.
 
-### Removing the Gamepad Update Nag
+### Removing the Gamepad Update Nag {docsify-ignore}
 1. Get back into recovery_menu and start wupserver again.
 1. Insert `w.dl("/vol/system/proc/prefs/DRCCfg.xml")` into the CLI.
 1. Open `DRCCfg.xml` in text editor.
@@ -74,10 +74,10 @@ type=eth
 1. Press a button on the wiiu to shut down wupserver and go to `Shutdown`.
 1. The console should no longer try to update the gamepad.
 
-### WTF? WHY DO I HAVE TO FORMAT?
+### WTF? WHY DO I HAVE TO FORMAT? {docsify-ignore}
 You have to format the system or else you will not boot after changing the `product_area` value. I dont know why especially since I have changed it in the past and I was still able to boot fine.
 
-## Credits
+### Credits {docsify-ignore}
 - Lazr - Figured out how to do it. The writeup is [here](/docs/writeup.md).
 - GaryOderNichts - UDPIH and the recovery_menu. (kinda) urged me to make this.
 - Nightkingale- Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://nightkingale.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.

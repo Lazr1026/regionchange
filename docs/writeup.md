@@ -32,7 +32,9 @@ Took me an entire week but I did i- oh what the hell, 160-0103 now?
 
 ![](../files/writeup_images/1600103.jpg)
 
-Yeah this console was one of those that had a bug in the eMMC chip.
+~~Yeah this console was one of those that had a bug in the eMMC chip.~~
+
+Update (3/23/24): The eMMC was probably fine, SCFM was probably just screwed up due to the SLC restore.
 
 I could not fix it so I gave up trying anything. 
 That is the end of Japanese Wii U Era. 
