@@ -1,6 +1,6 @@
 # PLEASE READ!
 
-Honestly I didn't want to write this at the time because of the brick risks involved but nowadays can be fixed really easily.
+!> This guide is now outdated. Please follow the new guide on GBATemp [here](https://gbatemp.net/threads/650802/).
 
 ## Notes
 - You lose eshop access but game updates do still work.
