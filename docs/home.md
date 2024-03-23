@@ -2,6 +2,9 @@
 
 !> This guide is now outdated. Please follow the new guide on GBATemp [here](https://gbatemp.net/threads/650802/).
 
+<details>
+<summary>Click here for the guide despite the notice above.</summary>
+	
 ## Notes
 - You lose eshop access but game updates do still work.
 - If you are not that experienced with Wii U Homebrew, do not follow this. It's not as easy as region changing, say the 3DS.
@@ -80,3 +83,5 @@ You have to format the system or else you will not boot after changing the `prod
 - Nightkingale- Helping figure out it out. In fact, he was writing [The Downgrade of Doom](https://nightkingale.github.io/posts/the-downgrade-of-doom) while I wrote this if you want to check it out.
 - Maschell - Created [Tiramisu](https://tiramisu.foryour.cafe) and [Aroma](https://https://aroma.foryour.cafe) (these *really* helped with me gaining interest).
 - Nonsocial for the wupclient mods (because I am too stupid for it).
+
+</details>
