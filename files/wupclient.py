@@ -5,118 +5,11 @@
 import codecs
 import errno
 import os
+import re
 import socket
 import struct
 import sys
 from time import sleep
-
-STORAGE_MLC = '/vol/storage_mlc01/sys/title/'
-
-SYSTEM_TITLES = {
-    'JPN':[
-        '00050010-10040000',
-        '00050010-10041000',
-        '00050010-10043000',
-        '00050010-10044000',
-        '00050010-10045000',
-        '00050010-10047000',
-        '00050010-10048000',
-        '00050010-10049000',
-        '00050010-1004a000',
-        '00050010-1004b000',
-        '00050010-1004c000',
-        '00050010-1004d000',
-        '00050010-1004e000',
-        '00050010-1005a000',
-        '00050010-10062000',
-        '0005001b-10059000',
-        '0005001b-10067000',
-        '0005001b-10069000',
-        '00050030-10010009',
-        '00050030-1001000a',
-        '00050030-1001100a',
-        '00050030-100110ff',
-        '00050030-1001200a',
-        '00050030-1001300a',
-        '00050030-1001400a',
-        '00050030-1001500a',
-        '00050030-1001600a',
-        '00050030-10017009',
-        '00050030-1001700a',
-        '00050030-1001800a',
-        '00050030-1001900a',
-        '00050030-1006d00a'
-    ],
-    'USA':[
-        '00050010-10040100',
-        '00050010-10041100',
-        '00050010-10043100',
-        '00050010-10044100',
-        '00050010-10045100',
-        '00050010-10047100',
-        '00050010-10048100',
-        '00050010-10049100',
-        '00050010-1004a100',
-        '00050010-1004b100',
-        '00050010-1004c100',
-        '00050010-1004d100',
-        '00050010-1004e100',
-        '00050010-1005a100',
-        '00050010-10062100',
-        '0005001b-10059100',
-        '0005001b-10067100',
-        '0005001b-10069100',
-        '00050030-10010109',
-        '00050030-10011109',
-        '00050030-1001010a',
-        '00050030-1001110a',
-        '00050030-100111ff',
-        '00050030-1001210a',
-        '00050030-1001310a',
-        '00050030-1001410a',
-        '00050030-1001510a',
-        '00050030-1001610a',
-        '00050030-10017109',
-        '00050030-1001710a',
-        '00050030-1001810a',
-        '00050030-1001910a',
-        '00050030-1006d10a'
-    ],
-    'EUR':[
-        '00050010-10040200',
-        '00050010-10041200',
-        '00050010-10043200',
-        '00050010-10044200',
-        '00050010-10045200',
-        '00050010-10047200',
-        '00050010-10048200',
-        '00050010-10049200',
-        '00050010-1004a200',
-        '00050010-1004b200',
-        '00050010-1004c200',
-        '00050010-1004d200',
-        '00050010-1004e200',
-        '00050010-1005a200',
-        '00050010-10062200',
-        '0005001b-10059200',
-        '0005001b-10067200',
-        '0005001b-10069200',
-        '00050030-10010209',
-        '00050030-1001020a',
-        '00050030-1001120a',
-        '00050030-100112ff',
-        '00050030-1001220a',
-        '00050030-1001320a',
-        '00050030-1001420a',
-        '00050030-1001520a',
-        '00050030-1001620a',
-        '00050030-10017209',
-        '00050030-1001720a',
-        '00050030-1001820a',
-        '00050030-1001920a',
-        '00050030-1006d20a'
-    ]
-}
 
 def buffer(size):
     return bytearray([0x00] * size)
@@ -134,17 +27,29 @@ def get_string(buffer, offset):
         return s[:s.index(b'\x00')].decode('utf-8')
     return s.decode('utf-8')
 
-class wupclient:
-    s=None
+class WupClient:
+    s = None
 
-    def __init__(self, ip='10.0.0.74', port=1337):
-        self.s=socket.socket()
+    def __init__(self, ip, port=1337):
+        self.s = socket.socket()
         self.s.connect((ip, port))
-        self.fsa_handle = self.open('/dev/fsa', 0)
-        self.cwd = '/vol/storage_mlc01'
 
+    @property
+    def fsa_handle(self):
+        if not hasattr(self, '_fsa_handle') or not self._fsa_handle:
+            self._fsa_handle = self.open('/dev/fsa', 0)
+        return self._fsa_handle
+
+    @property
+    def cwd(self):
+        return '/vol/storage_mlc01'
+
+    @property
+    def sd_card(self):
+        return '/vol/storage_sdcard'
+    
     def __del__(self):
-        self.FSA_Unmount(self.fsa_handle, '/vol/storage_sdcard', 2)
+        self.FSA_Unmount(self.fsa_handle, self.sd_card, 2)
         self.close(self.fsa_handle)
 
     # fundamental comms
@@ -480,10 +385,28 @@ class wupclient:
             # else:
             print(data.decode('ascii'))
 
+    def flush_mlc(self):
+        print('Flushing MLC')
+        ret = self.FSA_FlushVolume(self.fsa_handle, self.cwd)
+        return hex(ret)
+
+    def create_update_folder(self, auto_flush=False, flags=0x777):
+        update_folder = f'{self.cwd}/sys/update'
+        self.rmdir(update_folder)
+        self.mkdir(update_folder, flags)
+        if auto_flush:
+            self.flush_mlc()
+
+    def force_restart(self):
+        self.svc_and_exit(0x72, [1])
+
+    def force_shutdown(self):
+        self.svc_and_exit(0x72, [0])
+
     def mkdir(self, path, flags):
         if path[0] != '/':
             path = self.cwd + '/' + path
-        ret = w.FSA_MakeDir(self.fsa_handle, path, flags)
+        ret = self.FSA_MakeDir(self.fsa_handle, path, flags)
         if ret == 0:
             return 0
         print('mkdir error (%s, %08X)' % (path, ret))
@@ -492,8 +415,8 @@ class wupclient:
     def chmod(self, filename, flags):
         if filename[0] != '/':
             filename = self.cwd + '/' + filename
-        ret = w.FSA_ChangeMode(self.fsa_handle, filename, flags)
-        print('chmod returned : ' + hex(ret))
+        ret = self.FSA_ChangeMode(self.fsa_handle, filename, flags)
+        print('chmod returned: ' + hex(ret))
 
     def cd(self, path):
         if path[0] != '/' and self.cwd[0] == '/':
@@ -503,7 +426,7 @@ class wupclient:
             self.cwd = path
             self.FSA_CloseDir(self.fsa_handle, dir_handle)
             return 0
-        print('cd error : path does not exist (%s)' % (path))
+        print('cd error: path does not exist (%s)' % (path))
         return -1
 
     def ls(self, path=None, return_data=False):
@@ -511,7 +434,7 @@ class wupclient:
             path = self.cwd + '/' + path
         ret, dir_handle = self.FSA_OpenDir(self.fsa_handle, path if path is not None else self.cwd)
         if ret != 0x0:
-            print('opendir error : ' + hex(ret))
+            print('opendir error: ' + hex(ret))
             return [] if return_data else None
         entries = []
         while True:
@@ -554,9 +477,6 @@ class wupclient:
                 self.mkdir(_dstpath, 0x600)
                 entries = self.ls(_srcpath, True)
                 q += [(_srcpath, _dstpath, e) for e in entries]
-
-    def pwd(self):
-        return self.cwd
 
     def cp(self, filename_in, filename_out):
         ret, in_file_handle = self.FSA_OpenFile(self.fsa_handle, filename_in, 'r')
@@ -700,13 +620,11 @@ class wupclient:
         ret = self.FSA_CloseFile(self.fsa_handle, file_handle)
 
     def askyesno(self):
-        yes = set(['yes', 'ye', 'y'])
-        no = set(['no','n', ''])
         while True:
             choice = input().lower()
-            if choice in yes:
+            if choice in ('yes', 'ye', 'y'):
                return True
-            elif choice in no:
+            elif choice in ('no','n', ''):
                return False
             else:
                print("Please respond with 'y' or 'n'")
@@ -726,7 +644,7 @@ class wupclient:
 
     # Credits to Nightkingale at https://nightkingale.com/posts/the-downgrade-of-doom
     def rmdir(self, path):
-        fsa_handle = w.fsa_handle
+        fsa_handle = self.fsa_handle
         if path[0] != '/':
             path = self.cwd + '/' + path
         ret, dir_handle = self.FSA_OpenDir(fsa_handle, path)
@@ -984,16 +902,418 @@ def flush_mlc():
     ret = w.FSA_FlushVolume(w.fsa_handle, '/vol/storage_mlc01')
     print(hex(ret))
 
-def remove_system_titles(region, auto_flush=True):
-    if (titles := SYSTEM_TITLES.get(region)) is not None and isinstance(titles, (tuple, list)):
-        for t in titles:
-            w.rmdir(STORAGE_MLC + t.replace('-', '/'))
-        if auto_flush:
-            flush_mlc()
+######################### REGION CHANGE ###############################
+def re_findall(obj, regex, only_first=True):
+    if re.search(regex, obj):
+        f = re.findall(regex, obj)
+        if isinstance(f, (list, tuple)) and len(f) > 0:
+            if only_first:
+                return f[0]
+            return f
+
+def re_sub(obj, regex, new):
+    return re.sub(regex, new, obj)
+
+def extract_sys_prod(obj):
+    sys_prod = {}
+    for f in (
+        'version',
+        'eeprom_version',
+        'product_area',
+        'game_region',
+        'ntsc_pal',
+        '5ghz_country_code',
+        '5ghz_country_code_revision',
+        'code_id',
+        'serial_id',
+        'model_number',
+    ):
+        if (_ := re_findall(obj, f'<{f}[^/]+</{f}>')) is not None:
+            sys_prod[f] = {
+                'value':re_findall(_, f'">(.*)</{f}>'),
+                'type':re_findall(_, r'type="(.*)" l'),
+                'length':re_findall(_, r'length="(.*)" a'),
+                'access':re_findall(_, r'access="(.*)">'),
+            }
+    return sys_prod
+
+def read_file(path, mode='r+'):
+    try:
+        with open(path, mode) as f:
+            return f.read()
+    except:
+        pass
+
+def write_file(obj, path, mode='w+'):
+    try:
+        with open(path, mode) as f:
+            return f.write(obj)
+    except:
+        pass
+
+def create_wupclient(ip_address, max_retries=3):
+    for i in range(max_retries):
+        try:
+            w = WupClient(ip_address)
+        except TimeoutError:
+            sleep(1)
+        else:
+            return w
+
+def ask_and_boolify(msg, values=('1', 'ok', 'on', 't', 'true', 'yes', 'ye', 'y', '')):
+    return input(msg).lower() in values
+
+SYSTEM_TITLES = {
+    'JPN':[
+        '00050010-10040000',
+        '00050010-10041000',
+        '00050010-10043000',
+        '00050010-10044000',
+        '00050010-10045000',
+        '00050010-10047000',
+        '00050010-10048000',
+        '00050010-10049000',
+        '00050010-1004a000',
+        '00050010-1004b000',
+        '00050010-1004c000',
+        '00050010-1004d000',
+        '00050010-1004e000',
+        '00050010-1005a000',
+        '00050010-10062000',
+        '0005001b-10059000',
+        '0005001b-10067000',
+        '0005001b-10069000',
+        '00050030-10010009',
+        '00050030-1001000a',
+        '00050030-1001100a',
+        '00050030-100110ff',
+        '00050030-1001200a',
+        '00050030-1001300a',
+        '00050030-1001400a',
+        '00050030-1001500a',
+        '00050030-1001600a',
+        '00050030-10017009',
+        '00050030-1001700a',
+        '00050030-1001800a',
+        '00050030-1001900a',
+        '00050030-1006d00a'
+    ],
+    'USA':[
+        '00050010-10040100',
+        '00050010-10041100',
+        '00050010-10043100',
+        '00050010-10044100',
+        '00050010-10045100',
+        '00050010-10047100',
+        '00050010-10048100',
+        '00050010-10049100',
+        '00050010-1004a100',
+        '00050010-1004b100',
+        '00050010-1004c100',
+        '00050010-1004d100',
+        '00050010-1004e100',
+        '00050010-1005a100',
+        '00050010-10062100',
+        '0005001b-10059100',
+        '0005001b-10067100',
+        '0005001b-10069100',
+        '00050030-10010109',
+        '00050030-10011109',
+        '00050030-1001010a',
+        '00050030-1001110a',
+        '00050030-100111ff',
+        '00050030-1001210a',
+        '00050030-1001310a',
+        '00050030-1001410a',
+        '00050030-1001510a',
+        '00050030-1001610a',
+        '00050030-10017109',
+        '00050030-1001710a',
+        '00050030-1001810a',
+        '00050030-1001910a',
+        '00050030-1006d10a'
+    ],
+    'EUR':[
+        '00050010-10040200',
+        '00050010-10041200',
+        '00050010-10043200',
+        '00050010-10044200',
+        '00050010-10045200',
+        '00050010-10047200',
+        '00050010-10048200',
+        '00050010-10049200',
+        '00050010-1004a200',
+        '00050010-1004b200',
+        '00050010-1004c200',
+        '00050010-1004d200',
+        '00050010-1004e200',
+        '00050010-1005a200',
+        '00050010-10062200',
+        '0005001b-10059200',
+        '0005001b-10067200',
+        '0005001b-10069200',
+        '00050030-10010209',
+        '00050030-1001020a',
+        '00050030-1001120a',
+        '00050030-100112ff',
+        '00050030-1001220a',
+        '00050030-1001320a',
+        '00050030-1001420a',
+        '00050030-1001520a',
+        '00050030-1001620a',
+        '00050030-10017209',
+        '00050030-1001720a',
+        '00050030-1001820a',
+        '00050030-1001920a',
+        '00050030-1006d20a'
+    ]
+}
+
+class RegionChanger(object):
+    IP_REGEX = re.compile(r'[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}')
+    MODEL_NUMBER_REGEX = re.compile(r'^(?P<wup>[A-Z]{3}+)-(?P<id>[0-9]{0,3}+)?(\()?(?P<region>[0-9]{0,3}+)?(\))?')
+
+    REGION_HAX = 119
+
+    SYS_PROD_PATH = '/vol/system/config/sys_prod.xml'
+    DRC_CONFIG_PATH = '/vol/system/proc/prefs/DRCCfg.xml'
+    COOLBOOT_PATH = '/vol/system/config/system.xml'
+
+    #def __init__(self, *args, **kwargs): pass
+
+    @property
+    def wup_ip(self):
+        if not hasattr(self, '_wup_ip') or self.IP_REGEX.match(self._wup_ip) is None:
+            self.wup_ip = self.ask_wup_ip()
+        return self._wup_ip
+
+    @wup_ip.setter
+    def wup_ip(self, value):
+         if self.IP_REGEX.match(value):
+            self._wup_ip = value
+
+    @property
+    def wup_client(self):
+        if not hasattr(self, '_wup_client') or self._wup_client is None:
+            self._wup_client = create_wupclient(self.wup_ip)
+        return self._wup_client
+
+    def close(self):
+        if self._wup_client is not None:
+            self._wup_client.kill()
+            self._wup_client = None
+
+    def ask_wup_ip(self):
+        ip = ''
+        while self.IP_REGEX.match(ip) is None:
+            ip = input('Enter the IP address: ')
+        print(f'IP address set: {ip}')
+        return ip
+
+    def check_serial_id(self, serial_id, *, mult=3, mod=10):
+        serial_id = re.sub('[a-zA-Z]', '', serial_id)
+        odds, evens = 0, 0
+        for i in range(len(serial_id[:-1])):
+            n = int(serial_id[i])
+            if i % 2 == 0:
+                odds += n
+            else:
+                evens += n
+        _ = ((mult * evens) + odds) % mod
+        return len(serial_id) == 9 and _ is not 0 and mod - _ == int(serial_id[-1:])
+
+    def guess_original_region(self, obj):
+        '''
+        First letter represents the model:
+            F is 32GB
+            G is 8GB
+        JPN:
+            code_id contains GJ || FJ
+            model_number equals WUP-001(01) || WUP-101(01)
+        EUR:
+            code_id contains GE || GA (AUS) || FE
+            model_number equals WUP-001(03) || WUP-001(04) || WUP-101(03) || WUP-101(04)
+        USA:
+            code_id contains GW || GB (BRA) || FW || FM || FU 
+            model_number equals WUP-001(02) || WUP-001(14) || WUP-101(02) || WUP-901(02)
+        Kiosk:
+            WIS-001 || WIS-002 || WIS-003 || WUT-001 || WUT-002 || WUT-011
+        Based on:
+        https://wiiubrew.org/wiki/Product_Information#Prefix
+        https://wiiu.gerbilsoft.com/?sort=system_model
+        '''
+        if isinstance(obj, dict) and ('model_number' in obj or 'code_id' in obj or 'product_area' in obj) and ('serial_id' in obj and self.check_serial_id(obj['serial_id'])):
+            if 'model_number' in obj and (model := self.MODEL_NUMBER_REGEX.match(obj['model_number']['value'])) is not None:
+                model = model.groupdict()
+                if isinstance(model, dict) and 'region' in model and model['region']:
+                    return self.guess_original_region(model['region'])
+            if 'code_id' in obj and len(obj['code_id']['value'][0:2]) == 2:
+                return self.guess_original_region(obj['code_id']['value'][1])
+            #return self.guess_original_region(obj['product_area']['value'])
+        if obj.upper() in ('1', '01', 'J', 'JPN'):
+            return (1, 'JPN')
+        if obj.upper() in ('2', '02', '12', '14', 'B', 'BRA', 'M', 'U', 'USA', 'W'):
+            return (2, 'USA')
+        if obj.upper() in ('4', '04', '3', '03', 'A', 'AUS', 'E', 'EUR'):
+            return (4, 'EUR')
+
+    def get_sys_prod_region_or_ask(self, msg='Enter the original region (1 = JPN, 2 = USA, 4 = EUR): '):
+        if hasattr(self, '_sys_prod') and isinstance(self._sys_prod, dict) and (r := self.guess_original_region(self._sys_prod)) is not None:
+            return r
+        return self.ask_region(msg)
+
+    def ask_region(self, msg='Enter the desired region (1 = JPN, 2 = USA, 4 = EUR): '):
+        region = self.guess_original_region(input(msg))
+        if not region:
+            return self.ask_region()
+        return region
+
+    def create_update_folder(self, flags=0x777):
+        w = self.wup_client
+        update_folder = f'{w.cwd}/sys/update'
+        w.rmdir(update_folder)
+        w.mkdir(update_folder, flags)
+        w.flush_mlc()
+
+    def _has_payload_loader_payload(self, obj):
+        return re_findall(obj, r'">(.*)</default_title_id>') in (
+            '000500101004E000',#Health and Safety Information JPN
+            '000500101004E100',#Health and Safety Information USA
+            '000500101004E200',#Health and Safety Information EUR
+        )
+
+    def overwrite_payload_loader_payload(self, sys_xml):
+        p = self._has_payload_loader_payload(sys_xml)
+        return not p or p and ask_and_boolify('WARNING: PAYLOAD LOADER IS STILL INSTALLED, ARE YOU SURE? (Y)es or (N)o')
+
+    def set_title_as_coldboot(self, title_id):
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None and w.cd(f'{w.cwd}/sys/title/{title_id.replace("-", "/")}') > -1 and overwrite_payload_loader_payload(sys_xml):
+            sys_xml = re_sub(sys_xml, r'">(.*)</default_title_id>', f'">{coldboot_title.replace("-", "")}</default_title_id>')
+            write_file(sys_xml, 'system_edited.xml')
+            if os.path.exists('system_edited.xml'):
+                w.up('system_edited.xml', self.COOLBOOT_PATH)
+
+    def set_wiiu_menu_as_coldboot(self):
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None:
+            region = self.get_sys_prod_region_or_ask()
+            self.set_title_as_coldboot({
+                'JPN':'00050010-10040000',
+                'USA':'00050010-10040100',
+                'EUR':'00050010-10040200',
+            }.get(region[1]))
+
+    def set_system_setting_as_coldboot(self):
+        #Check if there are any System Setting installed before setting this
+        w = self.wup_client
+        w.dl(self.COOLBOOT_PATH)
+        if (sys_xml := read_file('system.xml')) is not None:
+            region = self.get_sys_prod_region_or_ask()
+            self.set_title_as_coldboot({
+                'JPN':'00050010-10047000',
+                'USA':'00050010-10047100',
+                'EUR':'00050010-10047200',
+            }.get(region[1]))
+
+    def system_titles_remover(self, auto_flush=True):
+        if not ask_and_boolify('WARNING: REMOVING SYSTEM TITLES CAN BRICK YOUR CONSOLE, ARE YOU SURE? (Y)es or (N)o'):
+            return None
+        region = self.get_sys_prod_region_or_ask()
+        if (titles := SYSTEM_TITLES.get(region[1])) is not None and isinstance(titles, (tuple, list)):
+            w = self.wup_client
+            for t in titles:
+                w.rmdir(f"{w.cwd}/sys/title/{t.replace('-', '/')}")
+            if auto_flush:
+                w.flush_mlc()
+
+    def wiiu_region_changer(self):
+        w = self.wup_client
+        w.dl(self.SYS_PROD_PATH)
+        if (sys_prod := read_file('sys_prod.xml')) is not None:
+            game_region = self.ask_region()
+            self._sys_prod = extract_sys_prod(sys_prod)
+            sys_prod = re_sub(sys_prod, r'">[^/]</product_area>', f'">{game_region[0]}</product_area>')
+            sys_prod = re_sub(sys_prod, r'">[^/]</game_region>', f'">{self.REGION_HAX}</game_region>')
+            write_file(sys_prod, 'sys_prod_edited.xml')
+            if os.path.exists('sys_prod_edited.xml'):
+                w.up('sys_prod_edited.xml', self.SYS_PROD_PATH)
+                #self.create_update_folder()
+                #w.force_restart()
+
+    def gamepad_update_remover(self, version_check_flag=0):
+        if not ask_and_boolify('WARNING: Are you sure you want to remove the Gamepad update? (Y)es or (N)o'):
+            return None
+        w = self.wup_client
+        w.dl(self.DRC_CONFIG_PATH)
+        if (drc_config := read_file('DRCCfg.xml')) is not None:
+            drc_config = re_sub(drc_config, r'">[^/]</versionCheckFlag>', f'">{version_check_flag}</versionCheckFlag>')
+            write_file(drc_config, 'DRCCfg_edited.xml')
+            if os.path.exists('DRCCfg_edited.xml'):
+                w.up('DRCCfg_edited.xml', self.DRC_CONFIG_PATH)
+
+def inc_dec(b):
+    if not b:
+        return -1
+    return 1
+
+MENU = '''--------------- MENU ---------------
+1. Wii U Region Changer
+2. Gamepad Update Remover
+3. Set System Setting as Cooldboot
+4. (Re)create Update folder
+5. Old System Titles Remover
+
+9. Change WUP Server IP
+
+0. Exit
+
+> Input your choose: '''
+
+#MENU = '''--------------- [TITLE] ---------------> Press Y for continue or B for back: '''
+
+def main():
+    '''Edit sys_prod, edit system.xml, create update, flush mlc and restart'''
+    region_charger = RegionChanger()
+    """
+    menu_options = (
+        {'title':'Wii U Region Changer', 'meth':region_charger.wiiu_region_changer}, #Change Region & Remove System Titles
+        {'title':'Gamepad Update Remover', 'meth':region_charger.gamepad_update_remover}, #Remove Gamepad Update
+        {'title':'Set System Setting as Cooldboot', 'meth':region_charger.set_system_setting_as_coldboot}, #Set System Setting as coldboot title
+        {'title':'(Re)create Update folder', 'meth':region_charger.create_update_folder}, #(Re)create Update folder
+        {'title':'Old System Titles Remover', 'meth':region_charger.system_titles_remover}, #Remove System titles
+        {'title':'Change WUP Server IP', 'meth':region_charger.ask_wup_ip}, #Change WUP Server IP
+    )
+    choose = 0
+    while 0 <= choose < len(menu_options):
+        choose += inc_dec(ask_and_boolify(f"{choose} - {MENU.replace('TITLE', menu_options[choose]['title'])}"))
+    """
+    while (choose := input(MENU)) != '0':
+        if choose == '1':
+            #Change Region & Remove System Titles
+            region_charger.wiiu_region_changer()
+        elif choose == '2':
+            #Remove Gamepad Update
+            region_charger.gamepad_update_remover()
+        elif choose == '3':
+            #Set System Setting as coldboot title
+            region_charger.set_system_setting_as_coldboot()
+        elif choose == '4':
+            #Remove System titles
+            region_charger.create_update_folder()
+        elif choose == '5':
+            #Remove System titles
+            region_charger.system_titles_remover()
+        elif choose == '9':
+            #Change WUP Server IP
+            region_charger._wup_ip = region_charger.ask_wup_ip()
 
 if __name__ == '__main__':
-    w = wupclient()
-    mount_sd()
+    main()
+    #w = WupClient()
+    #mount_sd()
     # mount_odd_content()
 
     # print(w.pwd())
